@@ -1,0 +1,19 @@
+SecureAttendanceSystemPY/
+│
+├── database/
+│   └── attendance.db         # SQLite database file
+│   ├── init_db.py            # Initializes DB with encrypted schema
+│
+├── images/
+│   └── <roll>.jpg            # Student face images
+│
+├── scripts/
+│   ├── register_student.py   # GUI to register a student and capture face
+│   ├── mark_attendance.py    # Detects student faces from webcam and marks attendance
+│   ├── export_attendance.py  # Exports attendance to Excel
+│
+├── utils/
+│   ├── encryption_utils.py   # AES encryption/decryption helper
+│   ├── face_utils.py         # DeepFace-based face recognition logic
+│
+└── main.py                   # Tkinter-based dashboard to run features
