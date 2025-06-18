@@ -21,6 +21,14 @@ def mark_attendance():
 
     cap = cv2.VideoCapture(0)
 
+    # ✅ Performance Optimizations
+    cap.set(cv2.CAP_PROP_FPS, 30)  # Set target FPS
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Width: 640px
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Height: 480px
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))  # Use MJPEG for better throughput
+
+    
+
     already_marked = set()
 
     while True:

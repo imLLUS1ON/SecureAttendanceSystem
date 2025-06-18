@@ -1,22 +1,19 @@
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-#ensures project root is in sys.path
 
-import os
 import sqlite3
+import tkinter as tk
+from tkinter import messagebox
+import cv2
+from utils.encryption_utils import encrypt
+from database.init_db import initialize_database
 
 # Construct absolute path to attendance.db
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, '..', 'database', 'attendance.db')
 
 conn = sqlite3.connect(DB_PATH)
-
-import tkinter as tk
-from tkinter import messagebox
-import cv2
-from utils.encryption_utils import encrypt
-from database.init_db import initialize_database
 
 def register_student():
     def capture_image():
@@ -28,22 +25,41 @@ def register_student():
             return
 
         cap = cv2.VideoCapture(0)
-        ret, frame = cap.read()
-        cap.release()
 
-        if not ret:
-            messagebox.showerror("Error", "Camera failure.")
+        if not cap.isOpened():
+            messagebox.showerror("Error", "Cannot access the camera.")
             return
 
-        image_path = f"images/{roll}.jpg"
-        cv2.imwrite(image_path, frame)
+        print("[INFO] Press 's' to capture, 'q' to cancel...")
+
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                print("[ERROR] Failed to grab frame.")
+                break
+
+            cv2.imshow("Capture Student Image", frame)
+
+            key = cv2.waitKey(1)
+            if key == ord('s'):
+                image_path = f"images/{roll}.jpg"
+                cv2.imwrite(image_path, frame)
+                print(f"[INFO] Image saved at {image_path}")
+                break
+            elif key == ord('q'):
+                print("[INFO] Capture cancelled.")
+                cap.release()
+                cv2.destroyAllWindows()
+                return
+
+        cap.release()
+        cv2.destroyAllWindows()
 
         # Save to database
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO students VALUES (?, ?, ?)",
                   (encrypt(roll), encrypt(name), image_path))
         conn.commit()
-        conn.close()
 
         messagebox.showinfo("Success", f"{name} registered successfully.")
 
