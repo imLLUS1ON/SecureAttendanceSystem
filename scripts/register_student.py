@@ -39,7 +39,6 @@ def register_student():
         cv2.imwrite(image_path, frame)
 
         # Save to database
-        conn = sqlite3.connect("database/attendance.db")
         c = conn.cursor()
         c.execute("INSERT OR REPLACE INTO students VALUES (?, ?, ?)",
                   (encrypt(roll), encrypt(name), image_path))

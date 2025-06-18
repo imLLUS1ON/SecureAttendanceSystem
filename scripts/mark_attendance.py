@@ -21,7 +21,6 @@ from utils.encryption_utils import encrypt
 from database.init_db import initialize_database
 
 def mark_attendance():
-    conn = sqlite3.connect("database/attendance.db")
     c = conn.cursor()
 
     cap = cv2.VideoCapture(0)

@@ -16,7 +16,6 @@ import pandas as pd
 from utils.encryption_utils import decrypt
 
 def export_to_excel():
-    conn = sqlite3.connect("database/attendance.db")
     c = conn.cursor()
     c.execute("SELECT * FROM attendance")
     rows = c.fetchall()
