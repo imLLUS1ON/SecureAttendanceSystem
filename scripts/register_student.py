@@ -3,11 +3,18 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 #ensures project root is in sys.path
 
+import os
+import sqlite3
+
+# Construct absolute path to attendance.db
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, '..', 'database', 'attendance.db')
+
+conn = sqlite3.connect(DB_PATH)
+
 import tkinter as tk
 from tkinter import messagebox
 import cv2
-import os
-import sqlite3
 from utils.encryption_utils import encrypt
 from database.init_db import initialize_database
 
