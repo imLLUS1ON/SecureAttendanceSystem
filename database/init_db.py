@@ -5,9 +5,8 @@ import sqlite3
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, '..', 'database', 'attendance.db')
 
-conn = sqlite3.connect(DB_PATH)
-
 def initialize_database():
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
     # Students table
@@ -15,17 +14,36 @@ def initialize_database():
     CREATE TABLE IF NOT EXISTS students (
         roll TEXT PRIMARY KEY,
         name TEXT NOT NULL,
+        section TEXT NOT NULL,
         image_path TEXT NOT NULL
     )
     """)
 
-    # Attendance table
+    # Subjects table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS subjects (
+        subject_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL
+    )
+    """)
+
+    # Attendance table with subject support
     c.execute("""
     CREATE TABLE IF NOT EXISTS attendance (
         roll TEXT,
         date TEXT,
         time TEXT,
-        PRIMARY KEY (roll, date)
+        subject TEXT,
+        PRIMARY KEY (roll, date, subject)
+    )
+    """)
+
+    # Class sessions table
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS class_sessions (
+        date TEXT,
+        section TEXT,
+        PRIMARY KEY (date, section)
     )
     """)
 
