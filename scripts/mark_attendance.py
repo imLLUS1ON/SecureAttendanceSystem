@@ -1,8 +1,12 @@
+# Updated mark_attendance.py with Subject Selection UI
+
 import sys
 import os
 import sqlite3
 import cv2
 from datetime import datetime
+import tkinter as tk
+from tkinter import simpledialog
 
 # Add project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -15,19 +19,28 @@ from database.init_db import initialize_database
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(BASE_DIR, '..', 'database', 'attendance.db')
 
+def ask_subject():
+    root = tk.Tk()
+    root.withdraw()  # Hide root window
+    subject = simpledialog.askstring("Subject Input", "Enter Subject for this Attendance Session:")
+    root.destroy()
+    return subject
+
 def mark_attendance():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
+    subject = ask_subject()
+    if not subject:
+        print("[INFO] No subject provided. Exiting.")
+        return
+
     cap = cv2.VideoCapture(0)
 
-    # ✅ Performance Optimizations
-    cap.set(cv2.CAP_PROP_FPS, 30)  # Set target FPS
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)  # Width: 640px
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)  # Height: 480px
-    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))  # Use MJPEG for better throughput
-
-    
+    cap.set(cv2.CAP_PROP_FPS, 30)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*'MJPG'))
 
     already_marked = set()
 
@@ -45,19 +58,20 @@ def mark_attendance():
             now = datetime.now()
             date_str = now.strftime("%Y-%m-%d")
             time_str = now.strftime("%H:%M:%S")
-
             encrypted_roll = encrypt(roll)
 
-            # Check if attendance already exists for this roll & date
-            c.execute("SELECT 1 FROM attendance WHERE roll = ? AND date = ?", (encrypted_roll, date_str))
+            # Check if already marked for this subject & date
+            c.execute("SELECT 1 FROM attendance WHERE roll = ? AND date = ? AND subject = ?",
+                      (encrypted_roll, date_str, subject))
             if c.fetchone():
-                print(f"[INFO] Attendance already marked for {roll} today.")
+                print(f"[INFO] {roll} already marked for {subject} today.")
                 already_marked.add(roll)
             else:
-                c.execute("INSERT INTO attendance (roll, date, time) VALUES (?, ?, ?)", (encrypted_roll, date_str, time_str))
+                c.execute("INSERT INTO attendance (roll, date, time, subject) VALUES (?, ?, ?, ?)",
+                          (encrypted_roll, date_str, time_str, subject))
                 conn.commit()
                 already_marked.add(roll)
-                print(f"[INFO] Marked attendance for {roll} at {time_str} on {date_str}")
+                print(f"[INFO] Marked {roll} for {subject} at {time_str} on {date_str}")
 
         cv2.imshow("Camera - Press 'q' to quit", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
