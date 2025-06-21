@@ -19,8 +19,9 @@ def register_student():
     def capture_image():
         roll = roll_entry.get()
         name = name_entry.get()
+        section = section_entry.get()
 
-        if not roll or not name:
+        if not roll or not name or not section:
             messagebox.showerror("Error", "All fields are required.")
             return
 
@@ -57,8 +58,8 @@ def register_student():
 
         # Save to database
         c = conn.cursor()
-        c.execute("INSERT OR REPLACE INTO students VALUES (?, ?, ?)",
-                  (encrypt(roll), encrypt(name), image_path))
+        c.execute("INSERT OR REPLACE INTO students VALUES (?, ?, ?, ?)",
+                  (encrypt(roll), encrypt(name), encrypt(section), image_path))
         conn.commit()
 
         messagebox.showinfo("Success", f"{name} registered successfully.")
@@ -68,13 +69,17 @@ def register_student():
     win.title("Register Student")
     tk.Label(win, text="Roll Number").grid(row=0, column=0)
     tk.Label(win, text="Name").grid(row=1, column=0)
-
+    tk.Label(win, text="Section").grid(row=2, column=0)
+    
     roll_entry = tk.Entry(win)
     name_entry = tk.Entry(win)
+    section_entry = tk.Entry(win)
+    
     roll_entry.grid(row=0, column=1)
     name_entry.grid(row=1, column=1)
+    section_entry.grid(row=2, column=1)
 
-    tk.Button(win, text="Capture & Register", command=capture_image).grid(row=2, columnspan=2)
+    tk.Button(win, text="Capture & Register", command=capture_image).grid(row=3, columnspan=2)
     win.mainloop()
 
 if __name__ == "__main__":
