@@ -52,7 +52,8 @@ def mark_attendance():
 
         temp_path = "temp.jpg"
         cv2.imwrite(temp_path, frame)
-        roll = find_matching_roll(temp_path)
+        images_folder = os.path.join(BASE_DIR, '..', 'images')
+        roll = find_matching_roll(temp_path, images_folder)
 
         if roll and roll not in already_marked:
             now = datetime.now()

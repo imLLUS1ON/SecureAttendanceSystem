@@ -129,7 +129,7 @@ def show_attendance_percentage():
     # Window UI
     win = tk.Toplevel()
     win.title("Attendance Percentage")
-    win.geometry("600x400")
+    win.geometry("1300x600")
 
     filter_frame = tk.Frame(win)
     filter_frame.pack(pady=5)
